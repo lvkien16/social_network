@@ -6,13 +6,16 @@ import { FaUser } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { BeatLoader } from "react-spinners";
+import axios from "axios";
+import { IoWarningOutline } from "react-icons/io5";
+import { useRouter } from "next/navigation";
 
 export default function page() {
     interface IFormData {
         name: string;
         email: string;
         password: string;
-        confirmPassword: string;
+        confirmPassword?: string;
     }
 
     const [formData, setFormData] = useState<IFormData>({
@@ -24,13 +27,17 @@ export default function page() {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
 
+    const router = useRouter();
+
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setError("");
         setLoading(true);
+
         if (
             !formData.name ||
             !formData.email ||
@@ -53,38 +60,54 @@ export default function page() {
         }
 
         try {
-            const res = await fetch("/api/nodemailer/register", {
-                method: "POST",
+            const res = await axios.post("/api/mailer/register", {
+                email: formData.email,
+            }, {
                 headers: {
                     "Content-Type": "application/json",
                 },
-
-                body: JSON.stringify({
-                    email: formData.email,
-                }),
             });
 
-            const data = await res.json();
-
-            if (!res.ok) {
-                setError(data.message);
+            if (res.status !== 200) {
                 setLoading(false);
-                return;
+                setError(res.data.message || "Something went wrong");
+                return router.push(`/auth/register/verify-email/${encodeURIComponent(formData.email)}`);
             }
             setLoading(false);
+
+            const items = {
+                name: formData.name,
+                email: formData.email,
+                password: formData.password
+            } as IFormData;
+
+            localStorage.setItem("userInformation", JSON.stringify(items));
+
+            router.push(`/auth/register/verify-email/${encodeURIComponent(formData.email)}`);
+            
         } catch (error) {
-            console.log(error);
+            setLoading(false);
+            if (axios.isAxiosError(error)) {
+                setError(error.response?.data.message || "Something went wrong");
+                if(error.response?.data.message === "User already exists"){
+                    return;
+                }
+                return router.push(`/auth/register/verify-email/${encodeURIComponent(formData.email)}`);
+            } else {
+                console.log("Unexpected error:", error);
+                setError("An unexpected error occurred.");
+            }
         }
     };
     return (
         <>
-            <div className="pt-10 flex justify-center">
-                <div className="bg-secondary py-10 px-20 shadow-md">
-                    <h2 className="rounded py-3 text-center text-3xl font-semibold">
+            <div className="pt-10 flex justify-center w-full">
+                <div className="bg-secondary py-10 px-20 shadow-md max-w-full">
+                    <h2 className="pb-10 rounded text-center text-primary text-3xl font-semibold">
                         Register
                     </h2>
-                    {error && <div className="pt-3 text-red-500">{error}</div>}
-                    <form className="pt-5 flex-col gap-2" onSubmit={handleSubmit}>
+                    {error && <div className="pb-3 justify-center gap-2 text-red-500 flex items-center max-w-full"><IoWarningOutline />{error}</div>}
+                    <form className=" flex-col gap-2" onSubmit={handleSubmit}>
                         <div className="mb-3 flex items-center border border-primary rounded">
                             <label
                                 htmlFor="name"
@@ -162,7 +185,7 @@ export default function page() {
                                 type="submit"
                                 className="rounded py-2 w-full border border-primary bg-primary text-secondary hover:bg-transparent hover:text-primary font-semibold flex justify-center items-centerr"
                             >
-                                {loading ? <BeatLoader color="#3795BD" /> : "Register"}
+                                {loading ? <BeatLoader /> : "Register"}
                             </button>
                         </div>
                     </form>

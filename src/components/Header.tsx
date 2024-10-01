@@ -76,16 +76,17 @@ function Header() {
         </ul>
       </div>
       <div className="w-2/6 flex justify-between items-center">
-        <form className="hidden md:flex items-center ">
+        <form className="hidden md:flex items-stretch">
           <input
             type="text"
             placeholder="Search"
-            className="border border-r-0 rounded-bl rounded-tl border-primary px-1 bg-transparent text-primary outline-none w-32 lg:w-40"
+            className="py-1 border border-r-0 rounded-bl rounded-tl border-primary px-1 bg-transparent text-primary outline-none w-32 lg:w-40"
           />
-          <button className="flex items-center rounded-br rounded-tr justify-center text-primary border border-primary p-1 px-2 hover:bg-primary hover:text-secondary">
+          <button className="flex items-center rounded-br rounded-tr justify-center text-primary border border-primary md:px-2 lg:px-3 hover:bg-primary hover:text-secondary">
             <IoIosSearch />
           </button>
         </form>
+
         <div className="md:hidden">
           <button className="flex items-center justify-center text-primary border border-primary p-1 rounded-full hover:bg-primary hover:text-secondary">
             <IoIosSearch />
