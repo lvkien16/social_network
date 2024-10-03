@@ -10,7 +10,7 @@ import axios from "axios";
 import { IoWarningOutline } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 
-export default function page() {
+export default function Register() {
     interface IFormData {
         name: string;
         email: string;

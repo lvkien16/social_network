@@ -12,7 +12,6 @@ export default function VerifyEmail() {
     const [otp, setOtp] = useState('');
     const [loading, setLoading] = useState<boolean>(false);
     const { email } = useParams() as { email: string };
-    const [otpData, setOtpData] = useState<string>("");
 
     const router = useRouter();
 
