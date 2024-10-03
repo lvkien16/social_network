@@ -5,17 +5,11 @@ import { errorHandler } from "../utils/error";
 import jwt from "jsonwebtoken";
 import { LocalStorage } from "node-localstorage";
 
-interface IRegister {
-    name: string;
+interface IUser {
+    name?: string;
     email: string;
     password: string;
-    otp: string;
-}
-
-interface IOtpData {
-    otp: string;
-    email: string;
-    expiry: number;
+    otp?: string;
 }
 
 export const register = async (
@@ -23,21 +17,19 @@ export const register = async (
     res: Response,
     next: NextFunction
 ) => {
-    const { name, email, password, otp }: IRegister = req.body;
+    const { name, email, password, otp }: IUser = req.body;
 
     const localStoragePath = "./src/scratch";
     const localStorage = new LocalStorage(localStoragePath);
 
     const otpData = localStorage.getItem("otpData");
-    console.log(otpData);
-    if(otpData){
+    if (otpData) {
         const parsedOtpData = JSON.parse(otpData);
-        console.log(parsedOtpData);
-        if(parsedOtpData.email !== email || parsedOtpData.otp != otp){
+        if (parsedOtpData.email !== email || parsedOtpData.otp != otp) {
             return next(errorHandler(400, "Invalid OTP"));
         }
     }
-    else if(!name || !email || !password) {
+    else if (!name || !email || !password) {
         return next(errorHandler(400, "Something went wrong"));
     } else {
         return next(errorHandler(400, "Invalid OTP"));
@@ -53,7 +45,7 @@ export const register = async (
 
 
     try {
-        const existingUser = await User.findOne({email: email});
+        const existingUser = await User.findOne({ email: email });
         if (existingUser) {
             return next(errorHandler(400, "User with this email already exists"));
         }
@@ -63,5 +55,41 @@ export const register = async (
 
     } catch (error) {
         next(errorHandler(500, "An unexpected error occurred"));
+    }
+}
+
+export const login = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const { email, password }: IUser = req.body;
+
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return next(errorHandler(404, "User not found"));
+        }
+
+        const isMatch = await bcryptjs.compare(password, user.password);
+        if (!isMatch) {
+            return next(errorHandler(400, "The email or password is incorrect"));
+        }
+
+        const token = jwt.sign({ user: user }, process.env.JWT_SECRET as string, {
+            expiresIn: "1h",
+        });
+
+        const { password: pass, ...rest } = user.toObject();
+
+        res
+            .status(200)
+            .cookie("access_token", token, {
+                httpOnly: true,
+            })
+            .json({ rest, token });
+    } catch (error) {
+        next(error);
     }
 }
