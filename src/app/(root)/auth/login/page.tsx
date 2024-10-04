@@ -7,6 +7,10 @@ import { RiLockPasswordFill } from "react-icons/ri";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { IoWarningOutline } from "react-icons/io5";
+import { loginStatus } from "@/redux/user/userSlice";
+import { login } from "@/services/AuthService";
+import { useAppDispatch } from "@/redux/store";
+import { BeatLoader } from "react-spinners";
 
 export default function Login() {
   interface IFormData {
@@ -22,7 +26,7 @@ const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
 
 const router = useRouter();
-
+const dispatch = useAppDispatch();
 
 const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
   setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -44,14 +48,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   }
 
   try {
-      const res = await axios.post("/api/auth/login", {
-        email: formData.email,
-        password: formData.password,
-      }, {
-          headers: {
-              "Content-Type": "application/json",
-          },
-      });
+      const res = await login(formData.email, formData.password);
 
       if (res.status !== 200) {
           setLoading(false);
@@ -59,11 +56,15 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
           return;
       }
 
+      console.log(res);
+
       setLoading(false);
+      dispatch(loginStatus(res.data.userData));
       router.push(`/`);
       
   } catch (error) {
       setLoading(false);
+      console.log(error);
       if (axios.isAxiosError(error)) {
           setError(error.response?.data.message || "Something went wrong");
           if(error.response?.data.message === "User already exists"){
@@ -131,7 +132,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 type="submit"
                 className="rounded py-2 w-full border border-primary bg-primary text-secondary hover:bg-transparent hover:text-primary font-semibold flex justify-center items-centerr"
               >
-                Log in
+                {loading ? <BeatLoader /> : "Log in"}
               </button>
             </div>
           </form>
