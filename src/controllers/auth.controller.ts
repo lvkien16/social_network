@@ -81,15 +81,53 @@ export const login = async (
             expiresIn: "1h",
         });
 
-        const { password: pass, ...rest } = user.toObject();
+        const refreshToken = jwt.sign({user: user}, process.env.JWT_SECRET as string,{
+            expiresIn: "7d"
+        });
+
+        const userData = {name: user.name, username: user.username, profilePicture: user.profilePicture, email: user.email };
 
         res
             .status(200)
             .cookie("access_token", token, {
                 httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "strict",
+                maxAge: 3600000,
             })
-            .json({ rest, token });
+            .cookie("refresh_token", refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "strict",
+                maxAge: 604800000,
+            })
+            .json({ userData });
     } catch (error) {
         next(error);
+    }
+}
+
+export const refreshAccessToken = async (req: Request, res: Response, next: NextFunction) => {
+    const refreshToken = req.cookies.refresh_token;
+
+    if(!refreshToken){
+        return next(errorHandler(401, "No refresh token provided"));
+    }
+
+    try {
+        const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET as string);
+        const newAccessToken = jwt.sign({ user: decoded }, process.env.JWT_SECRET as string, {
+            expiresIn: "1h",
+        });
+
+        res.status(200).cookie("access_token",newAccessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 3600000,
+        })
+        .json({ message: "Access token refreshed successfully" });
+    } catch (error) {
+        
     }
 }
