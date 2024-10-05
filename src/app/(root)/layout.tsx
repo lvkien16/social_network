@@ -4,6 +4,15 @@ import Header from "@/components/Header";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ReduxProvider from "@/redux/user/ReduxProvider";
+import dynamic from "next/dynamic";
+
+const PrivateRoute = dynamic(
+
+  () => import("@/components/PrivateRoute"),
+  {
+    ssr: false,
+  }
+);
 
 export const metadata: Metadata = {
   title: "Sleepant",
@@ -21,9 +30,11 @@ export default function RootLayout({
         <body
           className={`antialiased`}
         >
-          <Header />
-          <div className="pt-16">{children}</div>
-          <ToastContainer />
+          <PrivateRoute>
+            <Header />
+            <div className="pt-16">{children}</div>
+            <ToastContainer />
+          </PrivateRoute>
         </body>
       </html>
     </ReduxProvider>

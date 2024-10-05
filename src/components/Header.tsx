@@ -10,11 +10,16 @@ import { LiaUserFriendsSolid } from "react-icons/lia";
 import { usePathname } from "next/navigation";
 import { GoBell } from "react-icons/go";
 import Logo from '@/public/images/Logo.jpg';
+import { useAppSelector } from "@/redux/store";
 
 function Header() {
   const pathname = usePathname();
+  const { currentUser } = useAppSelector((state) => state.user);
+
+  console.log(currentUser?.name);
 
   return (
+    currentUser && (
     <div className="z-50 flex justify-between items-center px-4 sm:px-8 h-16 w-screen bg-secondary fixed">
       <div className="w-1/6 h-full flex items-center">
         <Link href="/">
@@ -105,8 +110,8 @@ function Header() {
                 <span className="absolute -inset-1.5" />
                 <span className="sr-only">Open user menu</span>
                 <img
-                  alt=""
-                  src={Logo.src}
+                  alt="Profile Picture"
+                  src={currentUser.profilePicture || Logo.src}
                   className="h-8 w-8 rounded-full"
                 />
               </MenuButton>
@@ -117,7 +122,7 @@ function Header() {
             >
               <MenuItem>
                 <Link
-                  href={"profilePath"}
+                  href={`/profile/${currentUser?.username}`}
                   className="w-full text-center block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
                 >
                   Your Profile
@@ -144,6 +149,7 @@ function Header() {
         </div>
       </div>
     </div>
+    )
   );
 }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { ChangeEvent, useState } from 'react'
 import { MdEmail } from 'react-icons/md'
 import Link from "next/link";
 import { RiLockPasswordFill } from "react-icons/ri";
@@ -55,8 +55,6 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
           setError(res.data.message || "Something went wrong");
           return;
       }
-
-      console.log(res);
 
       setLoading(false);
       dispatch(loginStatus(res.data.userData));
