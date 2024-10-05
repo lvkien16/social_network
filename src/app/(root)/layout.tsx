@@ -28,11 +28,11 @@ export default function RootLayout({
     <ReduxProvider>
       <html lang="en">
         <body
-          className={`antialiased`}
-        >
+          className={`antialiased bg-third`}
+        > 
           <PrivateRoute>
             <Header />
-            <div className="pt-16">{children}</div>
+            <div className="pt-20 lg:pt-24 px-4 xl:px-44">{children}</div>
             <ToastContainer />
           </PrivateRoute>
         </body>
