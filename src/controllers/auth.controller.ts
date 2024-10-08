@@ -85,7 +85,7 @@ export const login = async (
             expiresIn: "7d"
         });
 
-        const userData = {name: user.name, username: user.username, profilePicture: user.profilePicture, email: user.email };
+        const {password: pass, ...rest} = user.toObject();
 
         res
             .status(200)
@@ -101,7 +101,7 @@ export const login = async (
                 sameSite: "strict",
                 maxAge: 604800000,
             })
-            .json({ userData });
+            .json({ rest });
     } catch (error) {
         next(error);
     }
