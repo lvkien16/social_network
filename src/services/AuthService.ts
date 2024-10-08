@@ -12,7 +12,7 @@ export const login = async (email: string, password: string) => {
         email,
         password,
         }, {
-            header: {
+            headers: {
                 "Content-Type": "application/json",
             }
         });

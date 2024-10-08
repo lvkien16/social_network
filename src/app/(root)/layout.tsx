@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ReduxProvider from "@/redux/user/ReduxProvider";
 import dynamic from "next/dynamic";
 
+
 const PrivateRoute = dynamic(
 
   () => import("@/components/PrivateRoute"),
@@ -29,10 +30,11 @@ export default function RootLayout({
       <html lang="en">
         <body
           className={`antialiased bg-third`}
+          id="root"
         > 
           <PrivateRoute>
             <Header />
-            <div className="pt-20 lg:pt-24 px-4 xl:px-44">{children}</div>
+            <div className="pt-20 xl:pt-24 px-4 xl:px-44">{children}</div>
             <ToastContainer />
           </PrivateRoute>
         </body>

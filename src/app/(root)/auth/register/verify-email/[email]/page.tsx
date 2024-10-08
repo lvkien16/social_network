@@ -82,9 +82,9 @@ export default function VerifyEmail() {
 
     return (
         <div className="pt-10 flex justify-center">
-            <div className="bg-secondary pb-10 px-20 shadow-md max-w-full">
+            <div className="bg-white pb-10 px-20 shadow-md max-w-full">
                 <h2 className="py-10 rounded text-center text-primary text-3xl font-semibold">
-                    Verify Your Email
+                    VERIFY YOUR EMAIL
                 </h2>
                 <div className="pb-3">
                     <p className="text-center">Enter the verification code send to your email:</p>
@@ -115,7 +115,7 @@ export default function VerifyEmail() {
                         </div>
                         <button
                             type="submit"
-                            className="rounded py-2 w-full border border-primary bg-primary text-secondary hover:bg-transparent hover:text-primary font-semibold flex justify-center items-centerr"
+                            className="rounded py-2 w-full border border-primary bg-primary text-white hover:bg-transparent hover:text-primary font-semibold flex justify-center items-centerr"
                         >
                             {loading ? <BeatLoader /> : "Resend Code"}
                         </button>

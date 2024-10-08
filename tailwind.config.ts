@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      scrollbarGutter: {
+        stable: 'stable',
+      },
       colors: {
         primary: "#0F6FEC",
         secondary: "#676A79",
