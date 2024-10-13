@@ -4,6 +4,7 @@ import { useAppSelector } from "@/redux/store";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { IoMdSettings } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
+import Link from "next/link";
 
 export default function Information() {
   const {currentUser} = useAppSelector(state => state.user);
@@ -49,9 +50,9 @@ export default function Information() {
       </div>
       <hr/>
       <div className="flex justify-center">
-        <button className="w-full py-2 text-primary hover:bg-secondary hover:text-white">
+        <Link href={`/profile/${currentUser?.username}`} className="text-secondary w-full py-2 text-center hover:text-primary">
         View Profile
-        </button>
+        </Link>
       </div>
       <hr/>
     </>

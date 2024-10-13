@@ -1,10 +1,9 @@
 "use client"
 
 import { useAppSelector } from '@/redux/store'
-import React, { ChangeEvent, useState } from 'react'
+import React, { useState } from 'react'
 import { AiFillPicture } from 'react-icons/ai';
 import { BsCalendar2EventFill } from 'react-icons/bs';
-import { FaSmile } from "react-icons/fa";
 import Modal from 'react-modal';
 import { IoMdClose } from "react-icons/io";
 import { MdPhotoLibrary } from 'react-icons/md';
@@ -114,6 +113,10 @@ export default function CreatePost() {
             }
             setLoading(false);
             setIsOpen(false);
+            setContent("");
+            setImages([]);
+            setError("");
+            setVisibility("");
         } catch (error) {
             setError("An unexpected error occured.");
         }
@@ -135,17 +138,13 @@ export default function CreatePost() {
                     <BsCalendar2EventFill color="#D6293E" />
                     Event
                 </button>
-                <button className="flex items-center gap-1 bg-third text-secondary hover:text-primary text-sm p-2 rounded-md">
-                    <FaSmile color="#F7C32E" />
-                    Feeling
-                </button>
             </div>
             {/* photo */}
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 className="w-full md:w-1/2 lg:w-1/3 rounded-md bg-white"
-                overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+                overlayClassName="fixed mt-16 lg:mt-0 inset-0 bg-black bg-opacity-50 flex justify-center items-center"
             >
                 <div>
                     <div className="py-5 border-b flex px-2 justify-between items-center">

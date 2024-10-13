@@ -65,6 +65,7 @@ export default function VerifyEmail() {
 
                     router.push("/auth/login");
                     toast.success("User created successfully");
+                    localStorage.removeItem("userInformation");
 
                 } catch (error) {
                     if (axios.isAxiosError(error)) {
