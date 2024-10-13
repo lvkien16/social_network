@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
           },
           profilePicture: {
             type: String,
-            default: "https://static.vecteezy.com/system/resources/previews/027/187/637/non_2x/sticker-cute-little-ant-cartoon-free-png.png"
+            default: "https://firebasestorage.googleapis.com/v0/b/social-network-88b1e.appspot.com/o/images%2Fdefault-profile-picture.webp?alt=media&token=d524bcd1-9adb-43d9-9ab6-a65043f97bd3 "
           },
           coverPicture: {
             type: String,
@@ -42,10 +42,27 @@ const userSchema = new mongoose.Schema(
           },
           birthday: {
             type: Date,
+            default: "",
           },
           biography: {
             type: String,
             default: "",
+          },
+          livesIn: {
+            type: String,
+            default: "",
+          },
+          status: {
+            type: String,
+            default: "",
+          },
+          work: {
+            type: String,
+            default: "",
+          },
+          hiddenInfo: {
+            type: Array,
+            default: [],
           }
     }, { timestamps: true }
 );
