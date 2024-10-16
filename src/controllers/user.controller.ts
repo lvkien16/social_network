@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import User from "../models/user.model";
 import { errorHandler } from "../utils/error";
+import bcryptjs from "bcryptjs";
 
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {
     const { username, currentuser } = req.params;
@@ -28,7 +29,47 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
     }
 }
 
-export const editInformation = async (req: Request, res: Response, next: NextFunction) => {
+export const editProfile = async (req: Request, res: Response, next: NextFunction) => {
     const { username } = req.params;
-    const { name, email, profilePicture, coverPicture, birthday, biography, livesIn, status, work } = req.body;
+    const { name, email, emailVisibility, profilePicture, birthday, birthdayVisibility, biography, livesIn, livesInVisibility, status, statusVisibility, work, workVisibility, enterPassword } = req.body;
+
+    try {
+        const user = await User.findOne({ username });
+        if (!user) {
+            return next(errorHandler(404, "User not found"));
+        } else {
+            const isMatch = await bcryptjs.compare(enterPassword, user.password);
+            if (!isMatch) {
+                return next(errorHandler(400, "The password is incorrect"));
+            } else {
+                const updateUser = await User.findOneAndUpdate({
+                    username
+                }, {
+                    $set: {
+                        name,
+                        email,
+                        emailVisibility,
+                        profilePicture,
+                        birthday,
+                        birthdayVisibility,
+                        biography,
+                        livesIn,
+                        livesInVisibility,
+                        status,
+                        statusVisibility,
+                        work,
+                        workVisibility
+                    }
+                }, { new: true });
+
+                if (!updateUser) {
+                    return next(errorHandler(500, "Failed to update user"));
+                }
+                const { password, ...rest } = updateUser.toObject();
+                res.status(200).json(rest);
+            }
+        }
+    } catch (error) {
+        next(error);
+    }
 }
