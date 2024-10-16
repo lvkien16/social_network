@@ -9,7 +9,7 @@ import { IUser } from "@/types/user"
 
 Modal.setAppElement('#root');
 
-export default function Information({ user, currentUser, navigation, setNavigation }: { user: IUser, currentUser: IUser, navigation: string, setNavigation: (value: string) => void }) {
+export default function Information({ user, currentUser, navigation, setNavigation, setUser }: { user: IUser, currentUser: IUser, navigation: string, setNavigation: (value: string) => void, setUser: (value: IUser) => void }) {
   const tabs = ["Feed", "Posts", "Friends", "Events", "About"];
   const [profilePictureModalIsOpen, setProfilePictureIsOpen] = useState(false);
   const [editProfileModalIsOpen, setEditProfileIsOpen] = useState(false);
@@ -36,22 +36,22 @@ export default function Information({ user, currentUser, navigation, setNavigati
           <div className="mt-2">
             <div className="flex justify-center sm:block">
               <p className="font-semibold">
-                {user.name}
+                {user?.name}
               </p>
             </div>
             <div className="flex gap-2 items-center justify-center sm:justify-start">
               <p className="text-secondary text-sm text-center hover:text-primary hover:cursor-pointer">
-                {user.followers.length} Followers
+                {user?.followers.length} Followers
               </p>
               <p className="text-secondary text-sm text-center hover:text-primary hover:cursor-pointer">
-                {user.following.length} Following
+                {user?.following.length} Following
               </p>
             </div>
           </div>
         </div>
         <div className="flex justify-center sm:start mt-3 sm:mt-0">
           {
-            currentUser?.username === user.username ? (
+            currentUser?.username === user?.username ? (
               <button onClick={openEditProfileModal} className="border  border-primary bg-primary py-1 px-2 text-white rounded hover:bg-white hover:text-primary flex items-center gap-2 justify-center">
                 <MdEdit />
                 Edit profile
@@ -102,6 +102,7 @@ export default function Information({ user, currentUser, navigation, setNavigati
       {/* edit profile modal */}
       <EditProfile
         user={user}
+        setUser={setUser}
         editProfileModalIsOpen={editProfileModalIsOpen}
         closeEditProfileModal={closeEditProfileModal}
         currentUser={currentUser}

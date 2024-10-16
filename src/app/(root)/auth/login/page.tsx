@@ -17,78 +17,76 @@ export default function Login() {
   interface IFormData {
     email: string;
     password: string;
-}
+  }
 
-const [formData, setFormData] = useState<IFormData>({
-  email: "",
-  password: ""
-});
-const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string>("");
+  const [formData, setFormData] = useState<IFormData>({
+    email: "",
+    password: ""
+  });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
-const router = useRouter();
-const dispatch = useAppDispatch();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
 
-const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-  setFormData({ ...formData, [e.target.name]: e.target.value });
-};
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-  if (
-    !formData.email ||
-    !formData.password
-    )
-       {
+    if (
+      !formData.email ||
+      !formData.password
+    ) {
       setError("All fields are required");
       setLoading(false);
       return;
-  }
+    }
 
-  try {
+    try {
       const res = await login(formData.email, formData.password);
-    console.log(res);
       if (res.status !== 200) {
-          setLoading(false);
-          setError(res.data.message || "Something went wrong");
-          return;
+        setLoading(false);
+        setError(res.data.message || "Something went wrong");
+        return;
       }
 
       setLoading(false);
       dispatch(loginStatus(res.data.rest));
       router.push(`/`);
-      
-  } catch (error) {
+
+    } catch (error) {
       setLoading(false);
       console.log(error);
       if (axios.isAxiosError(error)) {
-          setError(error.response?.data.message || "Something went wrong");
-          if(error.response?.data.message === "User already exists"){
-              return;
-          }
+        setError(error.response?.data.message || "Something went wrong");
+        if (error.response?.data.message === "User already exists") {
           return;
+        }
+        return;
       } else {
-          console.log("Unexpected error:", error);
-          setError("An unexpected error occurred.");
+        console.log("Unexpected error:", error);
+        setError("An unexpected error occurred.");
       }
-  }
-};
+    }
+  };
 
   return (
     <>
       <div className="pt-10 flex justify-center w-full">
         <div className="hidden lg:flex justify-center items-center px-5 lg:w-1/3 bg-white">
           <div>
-          <div className="flex gap-3 items-center justify-center">
-            <img src={Logo.src} alt="" className="w-12 h-12" />
-            <h2 className="font-bold text-3xl text-primary">SLEEPANT</h2>
-          </div>
-          <div className="pt-3">
-            <p className="text-2xl text-center text-secondary">Connect with friends and the world around on the sleepant</p>
-          </div>
+            <div className="flex gap-3 items-center justify-center">
+              <img src={Logo.src} alt="" className="w-12 h-12" />
+              <h2 className="font-bold text-3xl text-primary">SLEEPANT</h2>
+            </div>
+            <div className="pt-3">
+              <p className="text-2xl text-center text-secondary">Connect with friends and the world around on the sleepant</p>
+            </div>
           </div>
         </div>
         <div className="bg-white py-10 px-20 shadow-md lg:w-1/3">
@@ -105,7 +103,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 <MdEmail />
               </label>
               <input
-              onChange={handleChange}
+                onChange={handleChange}
                 type="email"
                 name="email"
                 placeholder="Email"
@@ -121,7 +119,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 <RiLockPasswordFill />
               </label>
               <input
-              onChange={handleChange}
+                onChange={handleChange}
                 type="password"
                 name="password"
                 placeholder="Password"

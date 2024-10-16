@@ -136,7 +136,7 @@ function Header() {
                   <span className="sr-only">Open user menu</span>
                   <img
                     alt="Profile Picture"
-                    src={currentUser.profilePicture || Logo.src}
+                    src={currentUser.profilePicture}
                     className="h-8 lg:w-10 w-8 lg:h-10 rounded-full"
                   />
                 </MenuButton>
