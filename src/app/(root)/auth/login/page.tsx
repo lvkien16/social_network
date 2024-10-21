@@ -61,7 +61,6 @@ export default function Login() {
 
     } catch (error) {
       setLoading(false);
-      console.log(error);
       if (axios.isAxiosError(error)) {
         setError(error.response?.data.message || "Something went wrong");
         if (error.response?.data.message === "User already exists") {

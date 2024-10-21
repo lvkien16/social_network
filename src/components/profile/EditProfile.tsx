@@ -4,13 +4,12 @@ import React, { useEffect, useState } from 'react'
 import { IoMdClose } from "react-icons/io";
 import Modal from 'react-modal';
 import { ClipLoader, BeatLoader } from "react-spinners";
-import { IUser } from "@/types/user"
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { storage } from '@/firebase/config';
+import { IUser } from "@/types/user";
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { editProfileStatus } from '@/redux/user/userSlice';
 import { useAppDispatch } from "@/redux/store";
+import { uploadOneImage } from '@/hooks/useUploadImage';
 
 export default function EditProfile({ user, editProfileModalIsOpen, closeEditProfileModal, currentUser, setUser }: { user: IUser, editProfileModalIsOpen: boolean, closeEditProfileModal: () => void, currentUser: IUser, setUser: (value: IUser) => void }) {
     const [formEdit, setFormEdit] = useState({
@@ -61,17 +60,17 @@ export default function EditProfile({ user, editProfileModalIsOpen, closeEditPro
 
     const handleChangeProfilePicture = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
+        if (file && file.type.startsWith('image/')) {
+            const type = 'profilePictures';
+            const username = currentUser.username;
             setLoading(true);
-            const uploadedImage: { url: string, path: string } = { url: "", path: "" };
-            const storageRef = ref(storage, `images/${file.name}`);
-            await uploadBytes(storageRef, file);
-            const url = await getDownloadURL(storageRef);
-            uploadedImage.url = url;
-            uploadedImage.path = `images/${file.name}`;
-
-            setImageEdit(uploadedImage.url);
+            const uploadedImage = await uploadOneImage(file, type, username);
+            if (uploadedImage) {
+                setImageEdit(uploadedImage);
+            }
             setLoading(false);
+        } else {
+            toast.error('Please upload a valid image file!');
         }
     }
 
@@ -103,8 +102,6 @@ export default function EditProfile({ user, editProfileModalIsOpen, closeEditPro
             setLoading(false);
         }
     }
-
-    console.log(formEdit)
 
     return (
         <>

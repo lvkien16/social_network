@@ -1,6 +1,5 @@
 "use client"
 
-import { useAppSelector } from '@/redux/store'
 import React, { useState } from 'react'
 import { AiFillPicture } from 'react-icons/ai';
 import { BsCalendar2EventFill } from 'react-icons/bs';
@@ -18,13 +17,17 @@ import {
     uploadBytes,
 } from "firebase/storage";
 import axios from "axios";
+import CreateEvent from './CreateEvent';
+import { IUser } from '@/types/user';
+import { uploadManyImages } from '@/hooks/useUploadImage';
+import { removeOneImage } from '@/hooks/useRemoveOneImage';
 
 Modal.setAppElement('#root');
 
-export default function CreatePost() {
-    const { currentUser } = useAppSelector((state) => state.user);
-    const [modalIsOpen, setIsOpen] = useState(false);
-    const [images, setImages] = useState<{ url: string; path: string }[]>([]);
+export default function CreatePost({ currentUser }: { currentUser: IUser }) {
+    const [modalCreatePostIsOpen, setCreatePostIsOpen] = useState(false);
+    const [modalCreateEventIsOpen, setCreateEventIsOpen] = useState(false);
+    const [images, setImages] = useState<string[]>([]);
     const [loadingImages, setLoadingImages] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
@@ -38,8 +41,11 @@ export default function CreatePost() {
         { value: 'private', label: 'Private' }
     ]
 
-    const openModal = () => setIsOpen(true);
-    const closeModal = () => setIsOpen(false);
+    const openCreatePostModal = () => setCreatePostIsOpen(true);
+    const closeCreatePostModal = () => setCreatePostIsOpen(false);
+
+    const openCreateEventModal = () => setCreateEventIsOpen(true);
+
 
     const handleContentChange = (
         event: React.ChangeEvent<HTMLTextAreaElement>
@@ -55,29 +61,23 @@ export default function CreatePost() {
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
         const files = event.target.files;
-        if (files) {
+        if (files && files.length > 0) {
+            const type = "posts";
+            const username = currentUser.username;
             setLoadingImages(true);
-            const uploadedImages: { url: string; path: string }[] = [];
-
-            for (const file of Array.from(files)) {
-                const storageRef = ref(storage, `images/${file.name}`);
-                await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(storageRef);
-                uploadedImages.push({ url, path: `images/${file.name}` });
+            const uploadedImages = await uploadManyImages(Array.from(files), type, username);
+            if (uploadedImages) {
+                setImages((prevImages) => [...prevImages, ...uploadedImages]);
             }
-
-            setImages((prevImages) => [...uploadedImages, ...prevImages]);
             setLoadingImages(false);
         }
     };
 
-    const removeImage = async (path: string) => {
-        const imageRef = ref(storage, path);
-        await deleteObject(imageRef);
-
-        setImages((prevImages) =>
-            prevImages.filter((image) => image.path !== path)
-        );
+    const removeImage = async (image: string) => {
+        if (image) {
+            await removeOneImage(image);
+            setImages((prevImages) => prevImages.filter((img) => img !== image));
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -90,17 +90,16 @@ export default function CreatePost() {
             return;
         }
         if (!visibility) {
-            setError("Visibility is required!!")
+            setError("Visibility is required!")
             setLoading(false);
             return;
         }
         try {
             const res = await axios.post("/api/post/create-post", {
-                type: "post",
                 owner: currentUser?.username,
                 content: content ? content : "",
                 visibility,
-                images: images.map((image) => image.url)
+                images: images.map((image) => image),
             }, {
                 headers: {
                     "Content-Type": "application/json",
@@ -112,7 +111,7 @@ export default function CreatePost() {
                 return;
             }
             setLoading(false);
-            setIsOpen(false);
+            setCreatePostIsOpen(false);
             setContent("");
             setImages([]);
             setError("");
@@ -127,29 +126,29 @@ export default function CreatePost() {
         <div className="bg-white mt-4 lg:mt-8 p-5 rounded-md">
             <div className="flex gap-2 items-center">
                 <img src={currentUser?.profilePicture} alt="" className="w-14 h-14 rounded-full " />
-                <button onClick={openModal} className="text-secondary w-full p-2 rounded-full hover:text-primary flex justify-start bg-third">What's on your mind?</button>
+                <button onClick={openCreatePostModal} className="text-secondary w-full p-2 rounded-full hover:text-primary flex justify-start bg-third">What's on your mind?</button>
             </div>
             <div className="flex gap-5 mt-3 items-center">
-                <button onClick={openModal} className="flex items-center gap-1 bg-third text-secondary hover:text-primary text-sm p-2 rounded-md">
+                <button onClick={openCreatePostModal} className="flex items-center gap-1 bg-third text-secondary hover:text-primary text-sm p-2 rounded-md">
                     <AiFillPicture color="#0CBC87" />
                     Photo/Video
                 </button>
-                <button className="flex items-center gap-1 bg-third text-secondary hover:text-primary text-sm p-2 rounded-md">
+                <button onClick={openCreateEventModal} className="flex items-center gap-1 bg-third text-secondary hover:text-primary text-sm p-2 rounded-md">
                     <BsCalendar2EventFill color="#D6293E" />
                     Event
                 </button>
             </div>
             {/* photo */}
             <Modal
-                isOpen={modalIsOpen}
-                onRequestClose={closeModal}
+                isOpen={modalCreatePostIsOpen}
+                onRequestClose={closeCreatePostModal}
                 className="w-full md:w-1/2 lg:w-1/3 rounded-md bg-white"
                 overlayClassName="fixed mt-16 lg:mt-0 inset-0 bg-black bg-opacity-50 flex justify-center items-center"
             >
                 <div>
                     <div className="py-5 border-b flex px-2 justify-between items-center">
                         <h2 className="text-xl font-bold text-primary">Create post</h2>
-                        <button onClick={closeModal} className="text-secondary hover:text-black">
+                        <button onClick={closeCreatePostModal} className="text-secondary hover:text-black">
                             <IoMdClose className="text-2xl" />
                         </button>
                     </div>
@@ -172,6 +171,7 @@ export default function CreatePost() {
                                 type="file"
                                 onChange={handleFileChange}
                                 multiple
+                                accept="image/*, video/*"
                                 hidden
                             />
                         </div>
@@ -188,12 +188,12 @@ export default function CreatePost() {
                                 {images.map((image, index) => (
                                     <div key={index} className="relative group">
                                         <img
-                                            src={image.url}
+                                            src={image}
                                             alt={`Uploaded ${index}`}
                                             className="w-24 h-24 object-cover border"
                                         />
                                         <div
-                                            onClick={() => removeImage(image.path)}
+                                            onClick={() => removeImage(image)}
                                             className="flex justify-center items-center bg-gray-200 opacity-0 group group-hover:opacity-100 transition duration-500 ease-in-out absolute top-0 bottom-0 right-0 left-0 bg-opacity-60 hover:cursor-pointer"
                                         >
                                             <MdDelete className="text-3xl text-red-500" />
@@ -210,6 +210,13 @@ export default function CreatePost() {
                     </form>
                 </div>
             </Modal>
+            {/* Create event */}
+            <CreateEvent
+                modalCreateEventIsOpen={modalCreateEventIsOpen}
+                setCreateEventIsOpen={setCreateEventIsOpen}
+                currentUser={currentUser}
+                options={options}
+            />
         </div>
     )
 }

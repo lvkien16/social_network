@@ -34,15 +34,15 @@ function Header() {
 
   return (
     currentUser && (
-      <div className="z-50 flex justify-between items-center px-4 xl:px-44 h-16 w-screen bg-white fixed shadow">
+      <div className="z-40 flex justify-between items-center px-4 xl:px-44 h-16 w-screen bg-white fixed shadow">
         <div className="w-2/6 h-full flex items-center gap-3 lg:gap-3">
           <Link href="/">
             <img src={Logo.src} alt="Logo" className="w-8 lg:w-10 h-8 lg:h-10" />
           </Link>
           <form className="hidden md:flex items-stretch relative">
             <input
-            onChange={handleChange}
-            value={searchInput}
+              onChange={handleChange}
+              value={searchInput}
               type="text"
               name="search"
               placeholder="Search..."
@@ -51,12 +51,12 @@ function Header() {
             <button type="submit" className="absolute top-0 bottom-0 flex items-center rounded-br rounded-tr justify-center text-secondary px-2 hover:text-black">
               <IoIosSearch />
             </button>
-            {isClearSearchInput && 
-            (
-              <span onClick={handleClearSearchInput} className="absolute top-0 bottom-0 right-0 flex items-center justify-center text-secondary px-2 hover:text-black">
-              <IoMdClose />
-            </span>
-            )
+            {isClearSearchInput &&
+              (
+                <span onClick={handleClearSearchInput} className="absolute top-0 bottom-0 right-0 flex items-center justify-center text-secondary px-2 hover:text-black">
+                  <IoMdClose />
+                </span>
+              )
             }
           </form>
 
@@ -137,7 +137,7 @@ function Header() {
                   <img
                     alt="Profile Picture"
                     src={currentUser.profilePicture}
-                    className="h-8 lg:w-10 w-8 lg:h-10 rounded-full"
+                    className="h-8 lg:w-10 w-8 lg:h-10 rounded"
                   />
                 </MenuButton>
               </div>
