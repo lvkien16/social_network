@@ -11,9 +11,11 @@ import { LuDot } from "react-icons/lu";
 import { useFormattedDate } from "@/hooks/userFormattedDate";
 import { IoIosMore } from "react-icons/io";
 import axios from "axios"
+import { IoMdHeart } from "react-icons/io";
 
 export default function Event({ event, currentUser }: { event: IEvent, currentUser: IUser }) {
     const [followers, setFollowers] = useState<string[]>(event.followers as string[]);
+    const [likes, setLikes] = useState<string[]>(event.likes as string[]);
     const formatDate = useFormattedDate();
 
     const handleFollowEvent = async (eventId: string) => {
@@ -27,6 +29,19 @@ export default function Event({ event, currentUser }: { event: IEvent, currentUs
             console.log(err);
         }
     }
+
+    const handleLikeEvent = async (eventId: string) => {
+        try {
+            const res = await axios.post(`/api/event/like-event/${eventId}/${currentUser.username}`);
+            if (res.status !== 200) {
+                return;
+            }
+            setLikes(res.data);
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     return (
         <div className="bg-white rounded-lg p-5 pb-0">
             <div className="flex items-center justify-between">
@@ -96,11 +111,20 @@ export default function Event({ event, currentUser }: { event: IEvent, currentUs
                 </div>
             </div>
             <div className="flex justify-between border-y">
-                <div className="py-3 flex gap-1 items-center w-1/4 justify-center hover:bg-third cursor-pointer text-secondary hover:text-primary">
-                    <CiHeart />
-                    <p>Like</p>
-                    <p>({event.likes.length})</p>
-                </div>
+                <button type="button" onClick={() => handleLikeEvent(event._id)} className="py-3 flex gap-1 items-center w-1/4 justify-center hover:bg-third cursor-pointer text-secondary hover:text-primary">
+                    {likes.includes(currentUser.username) ? (
+                        <>
+                            <IoMdHeart className="text-pink-500" />
+                            <p>Liked</p>
+                        </>
+                    ) : (
+                        <>
+                            <CiHeart />
+                            <p>Like</p>
+                        </>
+                    )}
+                    <p>({likes.length})</p>
+                </button>
                 <div className="py-3 flex gap-1 items-center w-1/4 justify-center hover:bg-third cursor-pointer text-secondary hover:text-primary">
                     <PiChatCircleThin />
                     <p>Comment</p>
