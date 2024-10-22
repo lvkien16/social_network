@@ -83,3 +83,23 @@ export const followEvent = async (req: Request, res: Response, next: NextFunctio
         next(error);
     }
 }
+
+export const likeEvent = async (req: Request, res: Response, next: NextFunction) => {
+    const {eventid, username} = req.params;
+    try {
+        const event = await Event.findById(eventid);
+        if(!event) {
+            return next(errorHandler(404, "Event not found"));
+        }
+        const userIndex = event.likes.indexOf(username);
+        if(userIndex === -1){
+            event.likes.push(username);
+        } else{
+            event.likes.splice(userIndex, 1);
+        }
+        await event.save();
+        res.status(200).json(event.likes);
+    } catch (error) {
+        next(error);
+    }
+}
