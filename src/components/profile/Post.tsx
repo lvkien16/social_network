@@ -12,21 +12,15 @@ import { FaCaretRight } from "react-icons/fa";
 import { IPost } from '@/types/post';
 import { IUser } from '@/types/user';
 import { IoMdHeart } from "react-icons/io";
+import { useHandleLikePost} from "@/hooks/usePostActions";
 
 export default function Post({post, currentUser}: {post: IPost, currentUser: IUser}) {
     const [likes, setLikes] = useState<string[]>(post.likes as string[]);
     const formatDate = useFormattedDate();
 
     const handleLikePost = async (postId: string) => {
-        try {
-            const res = await axios.post(`/api/post/like-post/${postId}/${currentUser.username}`);
-            if (res.status !== 200) {
-                return;
-            }
-            setLikes(res.data);
-        } catch (err) {
-            console.log(err)
-        }
+        const result = await useHandleLikePost(postId, currentUser.username);
+        setLikes(result);
     }
 
     return (

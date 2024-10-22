@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, ChangeEvent, useEffect } from 'react';
 import { IEvent } from '@/types/event';
 import { IUser } from '@/types/user';
 import { FaCaretRight } from "react-icons/fa";
@@ -10,37 +10,55 @@ import Link from "next/link";
 import { LuDot } from "react-icons/lu";
 import { useFormattedDate } from "@/hooks/userFormattedDate";
 import { IoIosMore } from "react-icons/io";
-import axios from "axios"
 import { IoMdHeart } from "react-icons/io";
+import { useHandleLikeEvent, useHandleFollowEvent, useHandleCommentEvent } from "@/hooks/useEventActions";
+import { BsFillSendFill } from "react-icons/bs";
+import axios from "axios";
 
 export default function Event({ event, currentUser }: { event: IEvent, currentUser: IUser }) {
     const [followers, setFollowers] = useState<string[]>(event.followers as string[]);
     const [likes, setLikes] = useState<string[]>(event.likes as string[]);
+    const [commentForm, setCommentForm] = useState<string>("");
+    const [comments, setComments] = useState<string[]>([]);
     const formatDate = useFormattedDate();
 
-    const handleFollowEvent = async (eventId: string) => {
-        try {
-            const res = await axios.post(`/api/event/follow-event/${eventId}/${currentUser.username}`);
-            if (res.status !== 200) {
+    useEffect(() => {
+        const fetchComments = async () => {
+            try {
+                const res = await axios.get(`/api/eventcomment/get-comment/${event._id}`);
+            if(res.status !== 200) {
                 return;
             }
-            setFollowers(res.data);
-        } catch (err) {
-            console.log(err);
+            setComments(res.data);
+            } catch (err) {
+                console.log(err);
+            }
         }
+        fetchComments();
+    }, [event]);
+
+    const handleFollowEvent = async (eventId: string) => {
+        const result = await useHandleFollowEvent(eventId, currentUser.username);
+        setFollowers(result);
     }
 
     const handleLikeEvent = async (eventId: string) => {
-        try {
-            const res = await axios.post(`/api/event/like-event/${eventId}/${currentUser.username}`);
-            if (res.status !== 200) {
-                return;
-            }
-            setLikes(res.data);
-        } catch (err) {
-            console.log(err)
-        }
+        const result = await useHandleLikeEvent(eventId, currentUser.username);
+        setLikes(result);
     }
+
+    const handleSendComment = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const result = await useHandleCommentEvent(event._id, currentUser.username, commentForm);
+        setCommentForm("");
+        setComments([result, ...comments]);
+    }
+
+    console.log(comments);
+
+    const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+        setCommentForm(e.target.value);
+      };
 
     return (
         <div className="bg-white rounded-lg p-5 pb-0">
@@ -137,6 +155,15 @@ export default function Event({ event, currentUser }: { event: IEvent, currentUs
                     <CiPaperplane />
                     <p>Send</p>
                 </div>
+            </div>
+            <div className="py-5">
+                <form onSubmit={handleSendComment} className="flex">
+                    <img src={currentUser.profilePicture} alt="" className="items-center w-10 h-10 rounded-full border mr-3" />
+                    <textarea required rows={1} name="comment" onChange={handleChange} value={commentForm} placeholder="Add a comment..." className="flex items-center resize-none w-full outline-none px-2 bg-third text-secondary border rounded-l border-r-0" />
+                    <button type="submit" className="px-3 py-1 bg-third text-secondary rounded-r hover:bg-third hover:text-primary">
+                        <BsFillSendFill />
+                    </button>
+                </form>
             </div>
         </div>
     )
