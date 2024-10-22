@@ -6,13 +6,16 @@ import Modal from 'react-modal';
 import { IoMdClose } from "react-icons/io";
 import EditProfile from "./EditProfile";
 import { IUser } from "@/types/user"
+import axios from 'axios'
 
 Modal.setAppElement('#root');
 
 export default function Information({ user, currentUser, navigation, setNavigation, setUser }: { user: IUser, currentUser: IUser, navigation: string, setNavigation: (value: string) => void, setUser: (value: IUser) => void }) {
-  const tabs = ["Feed", "Posts", "Friends", "Events", "About"];
+  const tabs = ["Feed", "Posts", "Friends", "Users", "About"];
   const [profilePictureModalIsOpen, setProfilePictureIsOpen] = useState(false);
   const [editProfileModalIsOpen, setEditProfileIsOpen] = useState(false);
+  const [followers, setFollowers] = useState<string[]>(user.followers as string[]);
+  const [following, setFollowing] = useState<string[]>(user.following as string[]);
 
   const handleChangeNavigation = (tab: string) => {
     setNavigation(tab);
@@ -23,6 +26,18 @@ export default function Information({ user, currentUser, navigation, setNavigati
 
   const openEditProfileModal = () => setEditProfileIsOpen(true);
   const closeEditProfileModal = () => setEditProfileIsOpen(false);
+
+  const handleFollowUser = async (username: string) => {
+    try {
+        const res = await axios.post(`/api/user/follow-user/${username}/${currentUser.username}`);
+        if (res.status !== 200) {
+            return;
+        }
+        setFollowers(res.data);
+    } catch (err) {
+        console.log(err);
+    }
+}
 
   return (
     <div className="bg-white rounded-lg">
@@ -41,10 +56,11 @@ export default function Information({ user, currentUser, navigation, setNavigati
             </div>
             <div className="flex gap-2 items-center justify-center sm:justify-start">
               <p className="text-secondary text-sm text-center hover:text-primary hover:cursor-pointer">
-                {user?.followers.length} Followers
+                {followers.length}
+                {followers.length > 1 ? " Followers" : " Follower"}
               </p>
               <p className="text-secondary text-sm text-center hover:text-primary hover:cursor-pointer">
-                {user?.following.length} Following
+                {following.length} Following
               </p>
             </div>
           </div>
@@ -58,8 +74,8 @@ export default function Information({ user, currentUser, navigation, setNavigati
               </button>
             ) : (
               <div className="flex gap-2 items-center">
-                <button className="border border-primary bg-primary py-1 px-4 text-white rounded hover:bg-white hover:text-primary flex items-center gap-2 justify-center">
-                  Follow
+                <button onClick={() => handleFollowUser(user.username)} className="border border-primary bg-primary py-1 px-4 text-white rounded hover:bg-white hover:text-primary flex items-center gap-2 justify-center">
+                  {followers.includes(currentUser.username) ? "Following" : "Follow"}
                 </button>
                 <button className="border border-secondary hover:border-primary bg-white py-1 px-2 text-secondary rounded hover:text-primary flex items-center gap-2 justify-center">
                   Message
