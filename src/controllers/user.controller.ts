@@ -73,3 +73,23 @@ export const editProfile = async (req: Request, res: Response, next: NextFunctio
         next(error);
     }
 }
+
+export const followUser = async (req: Request, res: Response, next: NextFunction) => {
+    const {username, currentuser} = req.params;
+    try {
+        const user = await User.findOne({username});
+        if(!user) {
+            return next(errorHandler(404, "User not found"));
+        }
+        const userIndex = user.followers.indexOf(currentuser);
+        if(userIndex === -1){
+            user.followers.push(currentuser);
+        } else{
+            user.followers.splice(userIndex, 1);
+        }
+        await user.save();
+        res.status(200).json(user.followers);
+    } catch (error) {
+        next(error);
+    }
+}
