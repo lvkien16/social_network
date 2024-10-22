@@ -55,3 +55,23 @@ export const getPosts = async (req: Request, res: Response, next: NextFunction) 
         next(error);
     }
 }
+
+export const likePost = async (req: Request, res: Response, next: NextFunction) => {
+    const {postid, username} = req.params;
+    try {
+        const post = await Post.findById(postid);
+        if(!post) {
+            return next(errorHandler(404, "Post not found"));
+        }
+        const userIndex = post.likes.indexOf(username);
+        if(userIndex === -1){
+            post.likes.push(username);
+        } else{
+            post.likes.splice(userIndex, 1);
+        }
+        await post.save();
+        res.status(200).json(post.likes);
+    } catch (error) {
+        next(error);
+    }
+}
