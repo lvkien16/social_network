@@ -26,9 +26,9 @@ export const useHandleFollowEvent = async (eventId: string, username: string) =>
     }
 }
 
-export const useHandleCommentEvent = async (eventId: string, username: string, comment: string) => {
+export const useHandleCommentEvent = async (eventId: string, username: string, comment: string, replyingTo: string, profilePicture: string, name: string) => {
     try {
-        const res = await axios.post(`/api/eventcomment/create/${eventId}/${username}`, { comment });
+        const res = await axios.post(`/api/eventcomment/create/${eventId}/${username}`, { comment, replyingTo, profilePicture, name });
         if (res.status !== 201) {
             return;
         }

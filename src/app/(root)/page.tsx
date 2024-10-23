@@ -4,7 +4,9 @@ import Information from "@/components/home/Information";
 import Newsfeed from "@/components/home/Newsfeed";
 import WhoToFollow from "@/components/home/WhoToFollow";
 
+
 export default function Home() {
+
   return (
     <>
       <div className="flex gap-4 xl:gap-8">

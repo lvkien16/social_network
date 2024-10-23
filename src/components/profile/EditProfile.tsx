@@ -108,10 +108,10 @@ export default function EditProfile({ user, editProfileModalIsOpen, closeEditPro
             <Modal
                 isOpen={editProfileModalIsOpen}
                 onRequestClose={closeEditProfileModal}
-                className="w-full md:w-1/2 lg:w-1/3 rounded-md bg-white"
-                overlayClassName="fixed mt-16 lg:mt-0 inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+                className="w-full md:w-1/2 lg:w-1/3 z-50 rounded-md bg-white"
+                overlayClassName="fixed mt-16 z-50 lg:mt-0 inset-0 bg-black bg-opacity-50 flex justify-center items-center"
             >
-                <div>
+                <div className="max-h-[95vh] overflow-y-auto">
                     <div className="py-5 border-b flex px-2 justify-between items-center">
                         <h2 className="text-xl font-bold text-primary">Edit profile</h2>
                         <div className="py-3 flex px-2 justify-end items-center">
