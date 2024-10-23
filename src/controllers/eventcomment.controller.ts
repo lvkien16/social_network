@@ -4,13 +4,16 @@ import { errorHandler } from "../utils/error";
 
 export const createComment = async (req: Request, res: Response, next: NextFunction) => {
     const { eventid, username } = req.params;
-    const { comment } = req.body;
+    const { comment, replyingTo, profilePicture, name } = req.body;
 
     try {
         const eventComment = new EventComment({
             eventId: eventid,
             username,
             comment,
+            replyingTo,
+            name,
+            profilePicture
         });
 
         await eventComment.save();

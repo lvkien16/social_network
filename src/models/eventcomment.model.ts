@@ -6,7 +6,19 @@ const eventcommentSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        replyingTo: {
+            type: String,
+            default: "",
+        },
         username: {
+            type: String,
+            required: true,
+        },
+        profilePicture: {
+            type: String,
+            required: true,
+        },
+        name: {
             type: String,
             required: true,
         },
