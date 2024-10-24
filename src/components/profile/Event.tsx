@@ -19,6 +19,8 @@ import { IoMdClose } from 'react-icons/io';
 import Comment from "@/components/profile/Comment";
 import { IComment } from '@/types/comment';
 
+Modal.setAppElement('#root');
+
 export default function Event({ event, currentUser }: { event: IEvent, currentUser: IUser }) {
     const [followers, setFollowers] = useState<string[]>(event.followers as string[]);
     const [likes, setLikes] = useState<string[]>(event.likes as string[]);

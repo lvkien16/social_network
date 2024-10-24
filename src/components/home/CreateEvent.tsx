@@ -10,6 +10,8 @@ import { removeOneImage } from '@/hooks/useRemoveOneImage';
 import { MdDelete } from "react-icons/md";
 import axios from 'axios';
 
+Modal.setAppElement('#root');
+
 interface IFormEvent {
     title: string;
     description: string;
