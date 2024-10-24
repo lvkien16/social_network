@@ -37,3 +37,15 @@ export const useHandleCommentEvent = async (eventId: string, username: string, c
         console.log(err);
     }
 }
+
+export const useLikeCommentEvent = async (commentId: string, username: string) => {
+    try {
+        const res = await axios.post(`/api/eventcomment/like-comment/${commentId}/${username}`);
+        if(res.status !== 200) {
+            return;
+        }
+        return res.data;
+    } catch (err) {
+        console.log(err);
+    }
+}
