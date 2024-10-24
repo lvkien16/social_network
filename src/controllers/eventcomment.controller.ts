@@ -39,3 +39,20 @@ export const getComments = async (req: Request, res: Response, next: NextFunctio
         next(error);
     }
 }
+
+export const getReplyComments = async (req: Request, res: Response, next: NextFunction) => {
+    const { commentid } = req.params;
+
+    try {
+        const replyComments =await EventComment.find({ replyingTo: commentid}).sort({ createdAt: -1 });
+
+        if(!replyComments){
+            return next(errorHandler(404, "No reply comments found"));
+        }
+
+        res.status(200).json(replyComments);
+
+    } catch (error) {
+        next(error);
+    }
+}
